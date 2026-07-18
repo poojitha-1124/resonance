@@ -6,15 +6,21 @@ import { Header } from "@/components/dashboard/header"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = React.useState(false)
+  const [isCollapsed, setIsCollapsed] = React.useState(false)
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300">
-      {/* Dynamic Left Nav Sidebar (Static on desktop, sliding drawer block on mobile) */}
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      {/* Collapsible Left Navigation Sidebar (Static on desktop, sliding drawer overlay on mobile) */}
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        isCollapsed={isCollapsed}
+        onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+      />
 
-      {/* Main Container Column */}
+      {/* Main Container Column (expands automatically) */}
       <div className="flex flex-col flex-1 overflow-hidden">
-        {/* Top Header navbar */}
+        {/* Top Header Navigation */}
         <Header onMenuClick={() => setSidebarOpen(true)} />
 
         {/* Dynamic Inner Body Content */}
