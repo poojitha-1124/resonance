@@ -1,9 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Search, Bell, User, Settings, LogOut, Menu } from "lucide-react"
+import { Search, Bell, Menu } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
-import Link from "next/link"
+import { UserButton } from "@/lib/auth-context"
+import { dark } from "@clerk/themes"
 
 interface HeaderProps {
   onMenuClick: () => void
@@ -11,19 +12,13 @@ interface HeaderProps {
 
 export function Header({ onMenuClick }: HeaderProps) {
   const [showNotifications, setShowNotifications] = React.useState(false)
-  const [showProfileMenu, setShowProfileMenu] = React.useState(false)
-
   const notificationRef = React.useRef<HTMLDivElement>(null)
-  const profileRef = React.useRef<HTMLDivElement>(null)
 
   // Close menus when clicking outside
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
         setShowNotifications(false)
-      }
-      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
-        setShowProfileMenu(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
@@ -101,50 +96,15 @@ export function Header({ onMenuClick }: HeaderProps) {
         </div>
 
         {/* User Account Dropdown */}
-        <div className="relative" ref={profileRef}>
-          <button
-            onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="flex items-center gap-2 p-1 rounded-full group cursor-pointer focus:outline-none"
-          >
-            <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-650 flex items-center justify-center text-white font-bold text-xs ring-2 ring-transparent group-hover:ring-indigo-500/50 dark:group-hover:ring-violet-500/50 transition-all">
-              JD
-            </div>
-          </button>
-
-          {showProfileMenu && (
-            <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-zinc-200 bg-white p-2 shadow-xl dark:border-zinc-800 dark:bg-zinc-950 z-50">
-              <div className="px-4 py-3 border-b border-zinc-100 dark:border-zinc-900">
-                <p className="text-xs font-bold text-zinc-800 dark:text-zinc-100">John Doe</p>
-                <p className="text-[10px] text-zinc-500 truncate mt-0.5">john@resonance.ai</p>
-              </div>
-
-              <div className="py-2.5 space-y-1">
-                <Link
-                  href="/profile"
-                  onClick={() => setShowProfileMenu(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-650 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-900 transition-colors"
-                >
-                  <User className="h-4 w-4" />
-                  <span>My Profile</span>
-                </Link>
-                <Link
-                  href="/settings"
-                  onClick={() => setShowProfileMenu(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-650 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-900 transition-colors"
-                >
-                  <Settings className="h-4 w-4" />
-                  <span>Account Settings</span>
-                </Link>
-                <Link
-                  href="/"
-                  className="flex w-full items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-red-650 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/20 transition-colors border-t border-zinc-100 dark:border-zinc-900 pt-2 mt-1"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span>Logout</span>
-                </Link>
-              </div>
-            </div>
-          )}
+        <div className="flex items-center">
+          <UserButton
+            appearance={{
+              baseTheme: dark,
+              elements: {
+                userButtonAvatarBox: "h-8 w-8 rounded-full ring-2 ring-zinc-200 dark:ring-zinc-800 hover:ring-indigo-500 dark:hover:ring-violet-500 transition-all cursor-pointer",
+              }
+            } as any}
+          />
         </div>
       </div>
     </header>

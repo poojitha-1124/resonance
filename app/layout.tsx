@@ -19,12 +19,16 @@ export const metadata: Metadata = {
   keywords: ["AI Voice", "Voice Cloning", "Text to Speech", "Speech Synthesis", "AI Audio Generator"],
 };
 
+import { ClerkProvider } from "@clerk/nextjs"
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
+  const isBypass = process.env.NEXT_PUBLIC_AUTH_BYPASS === "true";
+
+  const content = (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
@@ -39,6 +43,16 @@ export default function RootLayout({
         </ThemeProvider>
       </body>
     </html>
+  );
+
+  if (isBypass) {
+    return content;
+  }
+
+  return (
+    <ClerkProvider>
+      {content}
+    </ClerkProvider>
   );
 }
 

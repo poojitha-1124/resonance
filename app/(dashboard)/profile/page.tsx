@@ -1,13 +1,29 @@
 "use client"
 
 import * as React from "react"
+import { useUser } from "@/lib/auth-context"
 import { Zap, ShieldCheck, Mail, User, Check, Save } from "lucide-react"
 
 export default function ProfilePage() {
-  const [fullName, setFullName] = React.useState("John Doe")
-  const [email, setEmail] = React.useState("john@resonance.ai")
+  const { user } = useUser()
+  const [fullName, setFullName] = React.useState("")
+  const [email, setEmail] = React.useState("")
   const [isSaving, setIsSaving] = React.useState(false)
   const [saveSuccess, setSaveSuccess] = React.useState(false)
+
+  React.useEffect(() => {
+    if (user) {
+      const timer = setTimeout(() => {
+        setFullName(user.fullName || user.firstName || "")
+        setEmail(user.primaryEmailAddress?.emailAddress || "")
+      }, 0)
+      return () => clearTimeout(timer)
+    }
+  }, [user])
+
+  const userInitials = user?.firstName
+    ? `${user.firstName[0]}${user.lastName ? user.lastName[0] : ""}`.toUpperCase()
+    : "R"
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,9 +49,14 @@ export default function ProfilePage() {
         {/* Profile Card & Details Form (8 cols) */}
         <form onSubmit={handleSave} className="lg:col-span-8 border border-zinc-200 bg-white p-6 rounded-3xl dark:border-zinc-900 dark:bg-zinc-950/40 space-y-6 relative">
           <div className="flex items-center gap-4 pb-4 border-b border-zinc-150 dark:border-zinc-900">
-            <div className="h-16 w-16 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-650 flex items-center justify-center text-white font-extrabold text-xl">
-              JD
-            </div>
+            {user?.imageUrl ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={user.imageUrl} className="h-16 w-16 rounded-full object-cover ring-2 ring-zinc-200 dark:ring-zinc-800" alt="Avatar" />
+            ) : (
+              <div className="h-16 w-16 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-650 flex items-center justify-center text-white font-extrabold text-xl">
+                {userInitials}
+              </div>
+            )}
             <div>
               <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">{fullName}</h3>
               <p className="text-xs text-zinc-450 dark:text-zinc-500">{email}</p>

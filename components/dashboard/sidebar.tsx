@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useUser, SignOutButton } from "@/lib/auth-context"
 import {
   LayoutDashboard,
   Mic,
@@ -25,6 +26,14 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen, onClose, isCollapsed = false, onToggleCollapse }: SidebarProps) {
+  const { user } = useUser()
+  const userEmail = user?.primaryEmailAddress?.emailAddress || "user@resonance.ai"
+  const userName = user?.fullName || user?.firstName || "Resonance User"
+  const userInitials = user?.firstName
+    ? `${user.firstName[0]}${user.lastName ? user.lastName[0] : ""}`.toUpperCase()
+    : "R"
+  const userAvatar = user?.imageUrl
+
   const pathname = usePathname()
 
   const navItems = [
@@ -129,38 +138,50 @@ export function Sidebar({ isOpen, onClose, isCollapsed = false, onToggleCollapse
           <div className="p-3 border-t border-zinc-200/80 dark:border-zinc-900">
             {isCollapsed ? (
               <div className="flex flex-col items-center gap-4 py-2">
-                <div
-                  className="h-9 w-9 rounded-full bg-indigo-500/20 text-indigo-650 dark:text-violet-455 flex items-center justify-center font-bold text-sm"
-                  title="John Doe (john@resonance.ai)"
-                >
-                  JD
-                </div>
-                <Link
-                  href="/"
-                  className="flex items-center justify-center p-2.5 rounded-xl text-red-650 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/20 transition-all duration-200"
-                  title="Logout"
-                >
-                  <LogOut className="h-4.5 w-4.5" />
-                </Link>
+                {userAvatar ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img src={userAvatar} className="h-9 w-9 rounded-full object-cover ring-2 ring-zinc-200 dark:ring-zinc-800" title={`${userName} (${userEmail})`} alt="User Avatar" />
+                ) : (
+                  <div
+                    className="h-9 w-9 rounded-full bg-indigo-500/20 text-indigo-650 dark:text-violet-455 flex items-center justify-center font-bold text-sm"
+                    title={`${userName} (${userEmail})`}
+                  >
+                    {userInitials}
+                  </div>
+                )}
+                <SignOutButton redirectUrl="/">
+                  <button
+                    className="flex items-center justify-center p-2.5 rounded-xl text-red-650 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/20 transition-all duration-200 cursor-pointer"
+                    title="Logout"
+                  >
+                    <LogOut className="h-4.5 w-4.5" />
+                  </button>
+                </SignOutButton>
               </div>
             ) : (
               <>
                 <div className="flex items-center gap-3 px-3 py-2.5 mb-2 rounded-xl bg-zinc-50 dark:bg-zinc-900/50">
-                  <div className="h-9 w-9 rounded-full bg-indigo-500/20 text-indigo-650 dark:text-violet-455 flex items-center justify-center font-bold text-sm">
-                    JD
-                  </div>
+                  {userAvatar ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={userAvatar} className="h-9 w-9 rounded-full object-cover ring-2 ring-zinc-200 dark:ring-zinc-800" alt="User Avatar" />
+                  ) : (
+                    <div className="h-9 w-9 rounded-full bg-indigo-500/20 text-indigo-650 dark:text-violet-455 flex items-center justify-center font-bold text-sm">
+                      {userInitials}
+                    </div>
+                  )}
                   <div className="flex-grow min-w-0">
-                    <p className="text-xs font-bold text-zinc-800 dark:text-zinc-100 truncate">John Doe</p>
-                    <p className="text-[10px] text-zinc-500 truncate">john@resonance.ai</p>
+                    <p className="text-xs font-bold text-zinc-800 dark:text-zinc-100 truncate">{userName}</p>
+                    <p className="text-[10px] text-zinc-500 truncate">{userEmail}</p>
                   </div>
                 </div>
-                <Link
-                  href="/"
-                  className="flex w-full items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-red-650 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/20 transition-all duration-200"
-                >
-                  <LogOut className="h-4.5 w-4.5" />
-                  <span>Logout</span>
-                </Link>
+                <SignOutButton redirectUrl="/">
+                  <button
+                    className="flex w-full items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-red-650 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/20 transition-all duration-200 cursor-pointer"
+                  >
+                    <LogOut className="h-4.5 w-4.5" />
+                    <span>Logout</span>
+                  </button>
+                </SignOutButton>
               </>
             )}
           </div>
