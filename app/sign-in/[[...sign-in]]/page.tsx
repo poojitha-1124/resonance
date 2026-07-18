@@ -126,7 +126,7 @@ export default function SignInPage() {
                 footerActionLink: "text-indigo-400 hover:text-indigo-305 hover:underline",
                 formButtonPrimary: "bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-2.5 cursor-pointer font-bold shadow-md",
               }
-            } as any}
+            } as React.ComponentProps<typeof SignIn>["appearance"]}
           />
         )}
       </div>

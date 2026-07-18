@@ -1,0 +1,71 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              String           @id @default(uuid())
+  clerkId         String           @unique
+  email           String           @unique
+  fullName        String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  settings        UserSettings?
+  voiceProfiles   VoiceProfile[]
+  generatedAudios GeneratedAudio[]
+  voiceHistories  VoiceHistory[]
+}
+
+model UserSettings {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  defaultLanguage String   @default("en-US")
+  defaultVoiceId  String?
+  theme           String   @default("dark")
+  autoPlay        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model VoiceProfile {
+  id              String           @id @default(uuid())
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  type            String           // e.g., "PRESET" or "CLONED"
+  description     String?
+  audioUrl        String?          // reference voice sample url
+  status          String           @default("ACTIVE") // e.g., "ACTIVE", "PROCESSING", "FAILED"
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  generatedAudios GeneratedAudio[]
+}
+
+model GeneratedAudio {
+  id             String        @id @default(uuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  voiceProfileId String?
+  voiceProfile   VoiceProfile? @relation(fields: [voiceProfileId], references: [id], onDelete: SetNull)
+  text           String
+  audioUrl       String
+  duration       Float
+  fileSize       Int
+  language       String        @default("en-US")
+  createdAt      DateTime      @default(now())
+}
+
+model VoiceHistory {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String   // e.g., "GENERATE_TTS", "CLONE_VOICE"
+  details   String?
+  createdAt DateTime @default(now())
+}

@@ -103,7 +103,7 @@ export function Header({ onMenuClick }: HeaderProps) {
               elements: {
                 userButtonAvatarBox: "h-8 w-8 rounded-full ring-2 ring-zinc-200 dark:ring-zinc-800 hover:ring-indigo-500 dark:hover:ring-violet-500 transition-all cursor-pointer",
               }
-            } as any}
+            }}
           />
         </div>
       </div>

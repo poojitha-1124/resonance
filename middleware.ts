@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server"
+import { NextResponse, NextRequest, NextFetchEvent } from "next/server"
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server"
 
 const isPublicRoute = createRouteMatcher(["/", "/sign-in(.*)", "/sign-up(.*)"])
 
-export default async function middleware(request: any, event: any) {
+export default async function middleware(request: NextRequest, event: NextFetchEvent) {
   if (process.env.NEXT_PUBLIC_AUTH_BYPASS === "true") {
     return NextResponse.next()
   }
