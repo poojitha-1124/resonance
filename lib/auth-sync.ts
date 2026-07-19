@@ -22,6 +22,8 @@ export interface OfflineUserType {
     description: string | null
     status: string
     audioUrl: string | null
+    createdAt: Date
+    updatedAt: Date
   }>
   generatedAudios: Array<{
     id: string
@@ -56,9 +58,9 @@ const MOCK_OFFLINE_USER: OfflineUserType = {
     autoPlay: true
   },
   voiceProfiles: [
-    { id: "vp_rachel", userId: "user_mock123_fallback", name: "Rachel (Narrator)", type: "PRESET", description: "Warm, professional assistant voice.", status: "ACTIVE", audioUrl: null },
-    { id: "vp_adam", userId: "user_mock123_fallback", name: "Adam (Developer)", type: "PRESET", description: "Deep, crisp male developer profile.", status: "ACTIVE", audioUrl: null },
-    { id: "vp_bella", userId: "user_mock123_fallback", name: "Bella (Educator)", type: "PRESET", description: "Clear, friendly tone for instructional walk-throughs.", status: "ACTIVE", audioUrl: null }
+    { id: "vp_rachel", userId: "user_mock123_fallback", name: "Rachel (Narrator)", type: "PRESET", description: "Warm, professional assistant voice.", status: "ACTIVE", audioUrl: null, createdAt: new Date("2026-07-18"), updatedAt: new Date("2026-07-18") },
+    { id: "vp_adam", userId: "user_mock123_fallback", name: "Adam (Developer)", type: "PRESET", description: "Deep, crisp male developer profile.", status: "ACTIVE", audioUrl: null, createdAt: new Date("2026-07-18"), updatedAt: new Date("2026-07-18") },
+    { id: "vp_bella", userId: "user_mock123_fallback", name: "Bella (Educator)", type: "PRESET", description: "Clear, friendly tone for instructional walk-throughs.", status: "ACTIVE", audioUrl: null, createdAt: new Date("2026-07-18"), updatedAt: new Date("2026-07-18") }
   ],
   generatedAudios: [
     { 
