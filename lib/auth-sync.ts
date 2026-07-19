@@ -6,6 +6,8 @@ export interface OfflineUserType {
   clerkId: string
   email: string
   fullName: string | null
+  username: string | null
+  bio: string | null
   createdAt: Date
   settings: {
     id: string
@@ -48,6 +50,8 @@ const MOCK_OFFLINE_USER: OfflineUserType = {
   clerkId: "user_mock123",
   email: "john@resonance.ai",
   fullName: "John Doe (Local Sandbox Mode)",
+  username: "johndoe_resonance",
+  bio: "AI voice explorer. Professional narrator, content creator, and technology advisor.",
   createdAt: new Date("2026-07-18"),
   isOfflineFallback: true,
   settings: {
@@ -108,11 +112,13 @@ export async function getSessionUser() {
   let clerkId: string
   let email: string
   let fullName: string | null = null
+  let username: string | null = null
 
   if (isBypass) {
     clerkId = "user_mock123"
     email = "john@resonance.ai"
     fullName = "John Doe"
+    username = "johndoe_resonance"
   } else {
     try {
       const session = await auth()
@@ -125,6 +131,7 @@ export async function getSessionUser() {
       clerkId = session.userId
       email = user.emailAddresses[0]?.emailAddress || ""
       fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim() || null
+      username = user.username || null
     } catch {
       // Return offline simulation if Clerk APIs fail or hit network issues
       return MOCK_OFFLINE_USER
@@ -152,6 +159,8 @@ export async function getSessionUser() {
           clerkId,
           email,
           fullName,
+          username,
+          bio: "",
           settings: {
             create: {
               defaultLanguage: "en-US",

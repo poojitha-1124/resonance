@@ -13,6 +13,8 @@ model User {
   clerkId         String           @unique
   email           String           @unique
   fullName        String?
+  username        String?
+  bio             String?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   settings        UserSettings?
