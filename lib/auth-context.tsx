@@ -16,7 +16,8 @@ export function useUser() {
         firstName: "John",
         lastName: "Doe",
         imageUrl: "", // empty forces initials renderer
-        primaryEmailAddress: { emailAddress: "john@resonance.ai" }
+        primaryEmailAddress: { emailAddress: "john@resonance.ai" },
+        createdAt: new Date("2026-07-18")
       }
     }
   }

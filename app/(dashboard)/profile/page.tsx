@@ -60,6 +60,11 @@ export default function ProfilePage() {
             <div>
               <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">{fullName}</h3>
               <p className="text-xs text-zinc-450 dark:text-zinc-500">{email}</p>
+              {user?.createdAt && (
+                <p className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5 font-medium">
+                  Joined: {new Date(user.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                </p>
+              )}
             </div>
           </div>
 

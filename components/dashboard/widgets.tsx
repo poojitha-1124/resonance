@@ -4,8 +4,15 @@ import * as React from "react"
 import Link from "next/link"
 import { Play, Pause, Download, Volume2, Mic, Library, Clock, ArrowUpRight, Sparkles, TrendingUp, Cpu } from "lucide-react"
 
+interface WelcomeCardProps {
+  userName?: string | null
+  usedCharacters: number
+  remainingCharacters: number
+  clonedProfilesCount: number
+}
+
 // Welcome Card widget wrapper
-export function WelcomeCard() {
+export function WelcomeCard({ userName, usedCharacters, remainingCharacters, clonedProfilesCount }: WelcomeCardProps) {
   return (
     <div className="relative overflow-hidden rounded-3xl bg-zinc-900 px-6 py-8 shadow-lg border border-zinc-800 text-white select-none">
       <div className="absolute top-1/2 left-1/2 -z-10 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(99,102,241,0.12),transparent_60%)] filter blur-xl pointer-events-none" />
@@ -16,19 +23,19 @@ export function WelcomeCard() {
           <Sparkles className="h-3 w-3" />
           <span>PRO SUITE ACTIVATED</span>
         </span>
-        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Welcome back, John!</h2>
+        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Welcome back, {userName || "Developer"}!</h2>
         <p className="text-sm text-zinc-400 leading-relaxed">
-          Create high-fidelity vocal overlays or profile speaker vectors. You have utilized <strong className="text-zinc-100">42,500 characters</strong> of your monthly allocation.
+          Create high-fidelity vocal overlays or profile speaker vectors. You have utilized <strong className="text-zinc-100">{usedCharacters.toLocaleString()} characters</strong> of your monthly allocation.
         </p>
 
         <div className="flex flex-wrap items-center gap-6 pt-2">
           <div>
             <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">REMAINING LIMIT</p>
-            <p className="text-lg font-mono font-bold text-indigo-400">107,500 chars</p>
+            <p className="text-lg font-mono font-bold text-indigo-400">{remainingCharacters.toLocaleString()} chars</p>
           </div>
           <div className="border-l border-zinc-800 pl-6">
             <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">CLONED PROFILES</p>
-            <p className="text-lg font-mono font-bold text-violet-400">3 active</p>
+            <p className="text-lg font-mono font-bold text-violet-400">{clonedProfilesCount} active</p>
           </div>
         </div>
       </div>
@@ -58,7 +65,7 @@ export function QuickActions() {
       desc: "Manage custom speaker vectors list",
       href: "/voice-library",
       icon: Library,
-      color: "text-rose-500 bg-rose-50/50 dark:bg-rose-950/20"
+      color: "text-rose-500 bg-rose-50/55 dark:bg-rose-950/20"
     },
     {
       title: "Audio History",
@@ -89,7 +96,7 @@ export function QuickActions() {
                   <h4 className="font-bold text-zinc-900 group-hover:text-indigo-650 dark:text-zinc-150 dark:group-hover:text-violet-400 text-sm">
                     {act.title}
                   </h4>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-500 mt-1">{act.desc}</p>
+                  <p className="text-xs text-zinc-505 dark:text-zinc-500 mt-1">{act.desc}</p>
                 </div>
               </div>
               <div className="flex justify-end pt-4 text-zinc-400 group-hover:text-zinc-650 dark:group-hover:text-zinc-200 transition-colors">
@@ -103,12 +110,18 @@ export function QuickActions() {
   )
 }
 
+interface StatsGridProps {
+  totalGenerationsCount: number
+  clonedProfilesCount: number
+  remainingCharacters: number
+}
+
 // Voice Statistics Cards Grid
-export function StatsGrid() {
+export function StatsGrid({ totalGenerationsCount, clonedProfilesCount, remainingCharacters }: StatsGridProps) {
   const stats = [
-    { title: "Total Speech Renditions", value: "484 files", change: "+12.4% weekly", icon: TrendingUp },
-    { title: "Embedding Match Accuracy", value: "99.4% average", change: "Highly stable", icon: Cpu },
-    { title: "Remaining Synth Credit", value: "107,500 chars", change: "Expires in 12 days", icon: Volume2 },
+    { title: "Total Speech Renditions", value: `${totalGenerationsCount} files`, change: "Dynamic statistics", icon: TrendingUp },
+    { title: "Saved Voice Profiles", value: `${clonedProfilesCount} active`, change: "Cloned presets count", icon: Cpu },
+    { title: "Remaining Synth Credit", value: `${remainingCharacters.toLocaleString()} chars`, change: "Pro bundle active", icon: Volume2 },
   ]
 
   return (
@@ -140,22 +153,62 @@ export function StatsGrid() {
   )
 }
 
+interface GeneratedAudioDetail {
+  id: string
+  text: string
+  audioUrl: string
+  duration: number
+  fileSize: number
+  language: string
+  createdAt: Date
+  voiceProfile: {
+    name: string
+  } | null
+}
+
+interface RecentGenerationsProps {
+  generations: GeneratedAudioDetail[]
+}
+
 // Recent Voice Generations table (with mini client audio visualizer player mock)
-export function RecentGenerations() {
-  const [playingId, setPlayingId] = React.useState<number | null>(null)
+export function RecentGenerations({ generations }: RecentGenerationsProps) {
+  const [playingId, setPlayingId] = React.useState<string | null>(null)
 
-  const mockAudios = [
-    { id: 1, name: "explainer_narrator_v2.mp3", voice: "Rachel (Narrator)", characters: 1540, date: "July 18, 2026" },
-    { id: 2, name: "my_cloned_profile_test_1.mp3", voice: "MyClonedVoice (Cloned)", characters: 460, date: "July 17, 2026" },
-    { id: 3, name: "developer_api_prompt.mp3", voice: "Adam (Developer)", characters: 3410, date: "July 15, 2026" },
-  ]
-
-  const togglePlayback = (id: number) => {
+  const togglePlayback = (id: string) => {
     if (playingId === id) {
       setPlayingId(null)
     } else {
       setPlayingId(id)
     }
+  }
+
+  if (generations.length === 0) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Recent Syntheses</h3>
+          <Link href="/audio-history" className="text-xs font-semibold text-indigo-650 hover:underline dark:text-violet-405">
+            See All History
+          </Link>
+        </div>
+
+        <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-zinc-200 dark:border-zinc-900 rounded-2xl bg-white dark:bg-zinc-950/40 text-center space-y-4">
+          <div className="p-3 bg-zinc-50 dark:bg-zinc-900 rounded-full">
+            <Volume2 className="h-6 w-6 text-zinc-400" />
+          </div>
+          <div>
+            <h4 className="font-bold text-zinc-800 dark:text-zinc-200 text-sm">No synthesis matches</h4>
+            <p className="text-xs text-zinc-505 dark:text-zinc-500 mt-1 max-w-sm">Use the workspace generator panel to synthesize custom voices from script lines.</p>
+          </div>
+          <Link
+            href="/generate-voice"
+            className="text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-xl shadow-md transition-all cursor-pointer"
+          >
+            Create Speech
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -179,39 +232,44 @@ export function RecentGenerations() {
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-200 dark:divide-zinc-900">
-            {mockAudios.map((audio) => (
-              <tr key={audio.id} className="hover:bg-zinc-50/30 dark:hover:bg-zinc-900/10 transition-colors">
-                <td className="p-4 font-bold text-zinc-800 dark:text-zinc-200">{audio.name}</td>
-                <td className="p-4">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full font-medium bg-zinc-100 text-zinc-650 dark:bg-zinc-900 dark:text-zinc-350">
-                    {audio.voice}
-                  </span>
-                </td>
-                <td className="p-4 font-mono hidden sm:table-cell">{audio.characters} chars</td>
-                <td className="p-4 text-zinc-500 hidden md:table-cell">{audio.date}</td>
-                <td className="p-4">
-                  <div className="flex justify-center items-center gap-2">
-                    <button
-                      onClick={() => togglePlayback(audio.id)}
-                      className={`p-2.5 rounded-xl border transition-colors ${
-                        playingId === audio.id
-                          ? "bg-red-50 text-red-550 border-red-200 dark:bg-red-955/20 dark:text-red-400 dark:border-red-955"
-                          : "border-zinc-200 bg-white hover:bg-zinc-50 dark:border-zinc-850 dark:bg-zinc-900 dark:hover:bg-zinc-800"
-                      }`}
-                    >
-                      {playingId === audio.id ? (
-                        <Pause className="h-3.5 w-3.5 fill-current" />
-                      ) : (
-                        <Play className="h-3.5 w-3.5 fill-current" />
-                      )}
-                    </button>
-                    <button className="p-2.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 dark:border-zinc-850 dark:bg-zinc-900 dark:hover:bg-zinc-800 transition-colors">
-                      <Download className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {generations.map((audio) => {
+              const fileName = audio.audioUrl.split("/").pop() || "synthesized_speech.mp3"
+              return (
+                <tr key={audio.id} className="hover:bg-zinc-50/30 dark:hover:bg-zinc-900/10 transition-colors">
+                  <td className="p-4 font-bold text-zinc-800 dark:text-zinc-200">{fileName}</td>
+                  <td className="p-4">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full font-medium bg-zinc-100 text-zinc-650 dark:bg-zinc-900 dark:text-zinc-350">
+                      {audio.voiceProfile?.name || "Default Preset"}
+                    </span>
+                  </td>
+                  <td className="p-4 font-mono hidden sm:table-cell">{audio.text.length} chars</td>
+                  <td className="p-4 text-zinc-550 hidden md:table-cell">
+                    {new Date(audio.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                  </td>
+                  <td className="p-4">
+                    <div className="flex justify-center items-center gap-2">
+                      <button
+                        onClick={() => togglePlayback(audio.id)}
+                        className={`p-2.5 rounded-xl border transition-colors ${
+                          playingId === audio.id
+                            ? "bg-red-50 text-red-550 border-red-200 dark:bg-red-955/20 dark:text-red-400 dark:border-red-955"
+                            : "border-zinc-200 bg-white hover:bg-zinc-50 dark:border-zinc-850 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+                        }`}
+                      >
+                        {playingId === audio.id ? (
+                          <Pause className="h-3.5 w-3.5 fill-current" />
+                        ) : (
+                          <Play className="h-3.5 w-3.5 fill-current" />
+                        )}
+                      </button>
+                      <button className="p-2.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 dark:border-zinc-850 dark:bg-zinc-900 dark:hover:bg-zinc-800 transition-colors">
+                        <Download className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>
